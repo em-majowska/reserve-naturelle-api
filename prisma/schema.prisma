@@ -1,0 +1,70 @@
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ZoneType {
+  VALLÉE
+  FORÊT
+  LAC
+  SOMMET
+  PRAIRIE
+  GLACIER
+}
+
+enum SpeciesType {
+  MAMMIFÈRE
+  OISEAU
+  REPTILE
+  AMPHIBIEN
+  INSECTE
+  PLANTE
+}
+
+enum ProtectionStatus {
+  LC
+  NT
+  VU
+  EN
+  CR
+}
+
+model Zone {
+  id            Int       @id @default(autoincrement())
+  name          String    @unique
+  type          ZoneType
+  altitude      Int?
+  description   String?
+  createdAt     DateTime  @default(now())
+  species       Species[]
+  observations  Observation[]
+}
+
+model Species {
+  id                Int           @id @default(autoincrement())
+  commonName        String
+  scientificName    String        @unique
+  type              SpeciesType
+  protectionStatus  ProtectionStatus
+  createdAt         DateTime      @default(now())
+
+  zones             Zone[]
+  observations      Observation[]
+}
+
+model Observation {
+  id                Int           @id @default(autoincrement())
+  quantity          Int
+  notes             String?
+  observedAt        DateTime      @default(now())
+  speciesId         Int
+  zoneId            Int
+
+  species           Species       @relation(fields: [speciesId], references: [id], onDelete: Cascade)
+  zone              Zone          @relation(fields: [zoneId], references: [id])
+}
