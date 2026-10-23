@@ -8,13 +8,13 @@
     "module": "esnext",
     "target": "es2022",
     "moduleResolution": "bundler",
-
-    "types": ["node"],
+    "types": ["node", "jest"],
 
     // Recommended Options
     "strict": true,
     "skipLibCheck": true,
     "esModuleInterop": true
   },
-  "include": ["src/**/*", "prisma7.config.ts", "prisma/seed.ts"]
+  "include": ["src/**/*", "prisma7.config.ts", "prisma/seed.ts", "tests/**/*"],
+  "exclude": ["node_modules"]
 }
