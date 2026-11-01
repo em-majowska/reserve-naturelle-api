@@ -3,12 +3,13 @@ import { ZodError } from "zod";
 import { Prisma } from "../generated/client";
 
 const errorHandler = (
-  error: any,
+  error: Error,
   _req: Request,
   res: Response,
   _next: NextFunction,
 ) => {
   console.error(error.stack);
+
   if (error instanceof ZodError) {
     return res.status(400).json({
       message: "Erreur de validation Zod",
@@ -17,14 +18,6 @@ const errorHandler = (
         message: e.message,
       })),
     });
-  }
-
-  if (error.name === "ValidationError") {
-    const errors = Object.values(error.errors).map((e: any) => ({
-      field: e.path,
-      message: e.message,
-    }));
-    return res.status(400).json({ message: "Erreur de validation", errors });
   }
 
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -62,12 +55,13 @@ const errorHandler = (
     });
   }
 
-  if (error.statusCode) {
-    return res.status(error.statusCode).json({
-      message: error.message,
-      statusCode: error.statusCode,
-    });
-  }
+  // if AppError
+  // if (error.statusCode) {
+  //   return res.status(error.statusCode).json({
+  //     message: error.message,
+  //     statusCode: error.statusCode,
+  //   });
+  // }
 
   return res.status(500).json({ message: "Erreur interne du serveur" });
 };

@@ -9,7 +9,7 @@ import { TGetAllObservations, TObservation } from "../types";
 export const getAllObservations = async (
   params: TQueryObservationInputSchema,
 ): Promise<TGetAllObservations> => {
-  const { zoneId, speciesId, page, perPage } = params;
+  const { zoneId, speciesId, page = 1, perPage = 20 } = params;
   const where: any = {};
 
   if (zoneId) {
@@ -54,7 +54,7 @@ export const getObservationById = async (
     where: { id },
     include: {
       zone: { select: { name: true } },
-      species: { select: { commonName: true } },
+      species: { select: { commonName: true, scientificName: true } },
     },
   });
 };

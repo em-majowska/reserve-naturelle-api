@@ -4,10 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "npx tsx watch src/index.ts",
+    "dev": "tsx watch src/index.ts",
     "type-check": "tsc --noEmit --watch",
     "build": "tsc",
-    "start": "node dist/index.js",
+    "start": "tsx dist/src/index.js",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watchAll",
     "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage"
@@ -18,7 +18,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.1",
     "@prisma/client": "^7.10.1",
@@ -31,10 +31,14 @@
     "@types/express": "^5.0.6",
     "@types/jest": "^30.0.0",
     "@types/node": "^26.6.5",
+    "@types/supertest": "^7.2.1",
     "@typescript/native": "npm:typescript@^7.0.2",
     "jest": "^30.5.2",
+    "jest-mock-extended": "^4.0.2",
     "prisma": "^7.10.1",
+    "supertest": "^7.3.1",
     "ts-jest": "^29.4.15",
+    "tsx": "^4.23.15",
     "typescript": "npm:@typescript/typescript6@^6.0.2"
   }
 }

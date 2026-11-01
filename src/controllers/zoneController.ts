@@ -10,8 +10,8 @@ export const getAll = async (
   next: NextFunction,
 ) => {
   try {
-    const result = await zoneService.getAll();
-    return res.status(200).json(result);
+    const zones = await zoneService.getAll();
+    return res.status(200).json(zones);
   } catch (error) {
     next(error);
   }
@@ -23,7 +23,13 @@ export const getById = async (
   next: NextFunction,
 ) => {
   try {
-    const zone = await zoneService.getById(req.params.id as unknown as TId);
+    const zone = await zoneService.getById(Number(req.params.id) as TId);
+
+    if (!zone) {
+      res.status(404).json({ error: "Zone not found" });
+      return;
+    }
+
     return res.status(200).json(zone);
   } catch (error) {
     next(error);
@@ -36,8 +42,8 @@ export const create = async (
   next: NextFunction,
 ) => {
   try {
-    const species = await zoneService.create(req.body);
-    return res.status(201).json(species);
+    const zone = await zoneService.create(req.body);
+    return res.status(201).json(zone);
   } catch (error) {
     next(error);
   }
@@ -48,11 +54,11 @@ export const update = async (
   next: NextFunction,
 ) => {
   try {
-    const species = await zoneService.update(
-      req.params.id as unknown as TId,
+    const zone = await zoneService.update(
+      Number(req.params.id) as TId,
       req.body,
     );
-    return res.status(200).json(species);
+    return res.status(200).json(zone);
   } catch (error) {
     next(error);
   }
@@ -64,7 +70,7 @@ export const remove = async (
   next: NextFunction,
 ) => {
   try {
-    await zoneService.remove(req.params.id as unknown as TId);
+    await zoneService.remove(Number(req.params.id) as TId);
     return res.status(204).send();
   } catch (error) {
     next(error);

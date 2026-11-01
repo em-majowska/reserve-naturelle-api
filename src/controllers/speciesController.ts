@@ -27,9 +27,13 @@ export const getById = async (
   next: NextFunction,
 ) => {
   try {
-    const species = await speciesService.getById(
-      req.params.id as unknown as TId,
-    );
+    const species = await speciesService.getById(Number(req.params.id) as TId);
+
+    if (!species) {
+      res.status(404).json({ error: "Species not found" });
+      return;
+    }
+
     return res.status(200).json(species);
   } catch (error) {
     next(error);
@@ -55,7 +59,7 @@ export const update = async (
 ) => {
   try {
     const species = await speciesService.update(
-      req.params.id as unknown as TId,
+      Number(req.params.id) as TId,
       req.body,
     );
     return res.status(200).json(species);
@@ -70,7 +74,7 @@ export const remove = async (
   next: NextFunction,
 ) => {
   try {
-    await speciesService.remove(req.params.id);
+    await speciesService.remove(Number(req.params.id));
     return res.status(204).send();
   } catch (error) {
     next(error);
@@ -84,12 +88,10 @@ export const addSpecies = async (
 ) => {
   try {
     await speciesService.addSpeciesToZone(
-      req.params.id as unknown as TId,
+      Number(req.params.id) as TId,
       req.body.zoneId,
     );
-    const species = await speciesService.getById(
-      req.params.id as unknown as TId,
-    );
+    const species = await speciesService.getById(Number(req.params.id) as TId);
     return res.status(201).json(species);
   } catch (error) {
     next(error);
@@ -102,11 +104,11 @@ export const removeSpecies = async (
   next: NextFunction,
 ) => {
   try {
-    await speciesService.removeSpeciesFromZone(
-      req.params.id as unknown as TId,
-      req.params.zoneId as unknown as TId,
+    const species = await speciesService.removeSpeciesFromZone(
+      Number(req.params.id) as TId,
+      Number(req.params.zoneId) as TId,
     );
-    return res.status(204).send();
+    return res.json(species);
   } catch (error) {
     next(error);
   }

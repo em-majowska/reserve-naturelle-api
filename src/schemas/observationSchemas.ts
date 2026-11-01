@@ -11,8 +11,8 @@ const createObservationInputSchema = z.object({
 const queryObservationInputSchema = z.object({
   zoneId: idSchema.optional(),
   speciesId: idSchema.optional(),
-  page: z.coerce.number().int().positive().default(1),
-  perPage: z.coerce.number().int().positive().default(20),
+  page: z.coerce.number().int().positive().optional().default(1),
+  perPage: z.coerce.number().int().positive().optional().default(20),
 });
 
 const updateObservationInputSchema = createObservationInputSchema.partial();

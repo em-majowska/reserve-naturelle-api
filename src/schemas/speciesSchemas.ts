@@ -13,7 +13,7 @@ const uniqueNameSchema = z
       });
       return !exists;
     },
-    { message: "Cette zone existe déja dans la base de données." },
+    { message: "Ce scientificName existe déja dans la base de données." },
   );
 
 const speciesTypeSchema = z.preprocess(

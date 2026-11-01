@@ -15,6 +15,6 @@ router.post(
   validate(createObservationSchema),
   observationController.create,
 );
-router.delete("/:id", validate(paramsIdSchema), observationController.getById);
+router.delete("/:id", validate(paramsIdSchema), observationController.remove);
 
 export default router;

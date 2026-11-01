@@ -3,9 +3,6 @@ import { mockPrisma } from "./mockPrisma";
 import { TObservation } from "../src/types";
 import { Prisma } from "../src/generated/client";
 import { NextFunction, Request, Response } from "express";
-jest.unstable_mockModule("../src/config/database", () => ({
-  default: mockPrisma,
-}));
 
 jest.unstable_mockModule("../src/services/observationService", () => ({
   getAllObservations: jest.fn(),
@@ -37,12 +34,12 @@ const mockResponse = (): Response => {
 
 const mockNext: NextFunction = jest.fn();
 
-const fakeObservations = [
+const fakeObservations: TObservation[] = [
   {
     id: 8,
     quantity: 2,
     notes: "Couple repéré en phase de chasse.",
-    observedAt: "2026-10-23T09:26:45.706Z",
+    observedAt: new Date(),
     zone: {
       name: "Plateau d'Emparis",
     },
@@ -54,7 +51,7 @@ const fakeObservations = [
     id: 5,
     quantity: 4,
     notes: "Vol plané caractéristique près de l’eau.",
-    observedAt: "2026-10-23T09:26:45.706Z",
+    observedAt: new Date(),
     zone: {
       name: "Lac du Lauvitel",
     },
@@ -79,9 +76,15 @@ describe("observationController", () => {
   });
 
   it("should call res.json with array of observations", async () => {
-    (observationService.getAllObservations as any).mockResolvedValue(
-      fakeObservations,
-    );
+    jest.mocked(observationService.getAllObservations).mockResolvedValue({
+      data: fakeObservations,
+      pagination: {
+        page: 1,
+        perPage: 20,
+        total: fakeObservations.length,
+        totalPages: 1,
+      },
+    });
 
     const req = mockRequest();
     const res = mockResponse();
@@ -90,14 +93,22 @@ describe("observationController", () => {
 
     expect(observationService.getAllObservations).toHaveBeenCalledTimes(1);
     expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.json).toHaveBeenCalledWith(fakeObservations);
+    expect(res.json).toHaveBeenCalledWith({
+      data: fakeObservations,
+      pagination: {
+        page: 1,
+        perPage: 20,
+        total: fakeObservations.length,
+        totalPages: 1,
+      },
+    });
     expect(mockNext).not.toHaveBeenCalled();
   });
 
   it("should return status 200 with the observation", async () => {
-    (observationService.getObservationById as any).mockResolvedValue(
-      fakeObservations[0],
-    );
+    jest
+      .mocked(observationService.getObservationById)
+      .mockResolvedValue(fakeObservations[0]);
 
     const req = mockRequest();
     const res = mockResponse();
@@ -111,32 +122,33 @@ describe("observationController", () => {
   });
 
   it("should return status 404 if observation is not found", async () => {
-    (observationService.getObservationById as any).mockRejectedValue(
-      prismaError,
-    );
+    jest
+      .mocked(observationService.getObservationById)
+      .mockRejectedValue(prismaError);
 
     const req = mockRequest({ params: { id: "999" } });
     const res = mockResponse();
 
     await observationController.getById(req, res, mockNext);
 
-    expect(observationService.getObservationById).toHaveBeenCalledWith(
-      "999" as any,
-    );
+    expect(observationService.getObservationById).toHaveBeenCalledWith(999);
     expect(observationService.getObservationById).toHaveBeenCalledTimes(1);
     expect(mockNext).toHaveBeenCalledWith(prismaError);
   });
 
   it("should return status 201 with created observation", async () => {
     const fakeData = {
+      id: 11,
       quantity: 2,
       notes: "Couple repéré en phase de chasse.",
-      observedAt: "2026-10-23T09:26:45.706Z",
+      observedAt: new Date(),
       zoneId: 1,
       speciesId: 1,
     };
 
-    (observationService.createObservation as any).mockResolvedValue(fakeData);
+    jest
+      .mocked(observationService.createObservation)
+      .mockResolvedValue(fakeData);
 
     const req = mockRequest({ body: fakeData });
     const res = mockResponse();
@@ -168,9 +180,9 @@ describe("observationController", () => {
       },
     );
 
-    (observationService.createObservation as any).mockRejectedValue(
-      prismaError,
-    );
+    jest
+      .mocked(observationService.createObservation)
+      .mockRejectedValue(prismaError);
 
     const req = mockRequest({ body: fakeData });
     const res = mockResponse();
@@ -184,29 +196,25 @@ describe("observationController", () => {
   });
 
   it("should return status 204 if observation was deleted", async () => {
-    (observationService.removeObservation as any).mockResolvedValue();
+    jest.mocked(observationService.removeObservation).mockResolvedValue(null);
     const req = mockRequest({ params: { id: "1" } });
     const res = mockResponse();
 
     await observationController.remove(req as any, res, mockNext);
-    expect(observationService.removeObservation).toHaveBeenCalledWith(
-      "1" as any,
-    );
+    expect(observationService.removeObservation).toHaveBeenCalledWith(1);
     expect(observationService.removeObservation).toHaveBeenCalledTimes(1);
     expect(res.status).toHaveBeenCalledWith(204);
   });
 
   it("should return status 404 if observation to delete is not found", async () => {
-    (observationService.removeObservation as any).mockRejectedValue(
-      prismaError,
-    );
+    jest
+      .mocked(observationService.removeObservation)
+      .mockRejectedValue(prismaError);
     const req = mockRequest({ params: { id: "999" } });
     const res = mockResponse();
 
     await observationController.remove(req as any, res, mockNext);
-    expect(observationService.removeObservation).toHaveBeenCalledWith(
-      "999" as any,
-    );
+    expect(observationService.removeObservation).toHaveBeenCalledWith(999);
     expect(observationService.removeObservation).toHaveBeenCalledTimes(1);
     expect(mockNext).toHaveBeenCalledWith(prismaError);
   });

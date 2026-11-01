@@ -29,7 +29,14 @@ export const getAll = async (
 export const getById = async (id: TId): Promise<TSpecies | null> => {
   return prisma.species.findUniqueOrThrow({
     where: { id },
-    include: { zones: true, observations: true },
+    include: {
+      zones: true,
+      observations: {
+        orderBy: { observedAt: "desc" },
+        take: 10,
+        include: { zone: { select: { name: true } } },
+      },
+    },
   });
 };
 
